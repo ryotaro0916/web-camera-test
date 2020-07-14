@@ -1,50 +1,130 @@
 <!DOCTYPE HTML>
 <html lang="ja">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>HTML Media Capture Sample</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <title>前撮り君 Web Version</title>
+    <style type="text/css">
+
+        .imgbox{
+            position: relative;
+        }
+	
+        .picturezone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            font-size: 5rem;
+        }
+        .picturesize{
+            width:100rem;
+            height:15rem;
+            border:2px dashed;
+            object-fit: contain;
+            }
+        .explane{
+            height:5rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>HTML Media Capture Sample</h1>
-    <form action="." method="post" enctype="multipart/form-data" onsubmit="return false;">
-        <input type="tel" id="niukeid" onInput="scancheck()">
-        <input type="file" id="cameraman" name="capture" accept="image/*" capture="camera"/>
-        <input type="button" value="Upload" onclick="addressapi()"/>
-    </form>
+    <main class="container">
+        <h1 class="has-text-centered">前撮り君 Web Version</h1>
+        <form action="." method="post" enctype="multipart/form-data" id="formobj" onsubmit="return false;">
+            <div class="columns is-mobile my-5 mx-5">
+                <div class="column is-6 imgbox" onclick="imageclick()">
+                    <img id="myImage" name="myImage" class="picturesize">
+                    <div id="guide" class="picturezone"><i class="far fa-image"></i></div>
+                </div>
+                <div class="column is-6">
+                    <div class="explane">
+                        <p>1.荷受番号を入力します</p>
+                        <input type="tel" class="input" id="niukeid">
+                    </div>
+                    <div class="explane"><p>2.左の枠をタップして撮影してください</p></div>
+                    <!-- <div ><label for="cameraman" class="button is-fullwidth is-info"><input type="file" id="cameraman" name="capture" onchange="openimg(this)" capture="camera" style="display:none" accept="image/*">撮影</label></div> -->
+                    <input type="file" id="cameraman" name="capture" onchange="openimg(this)" capture="camera" style="display:none" accept="image/*">
+                    <div class="explane">
+                        <p>3.撮影画像を確認後、送信してください</p>
+                        <input type="button" class="button is-fullwidth is-success" value="送信" onclick="addressapi()"/>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script>
+    var img_base = '';
+
     function ID(e){return document.getElementById(e);}
-    function scancheck(){
-        if (ID('niukeid').value.length == 6){
-            ID('cameraman').click();
-        }
-        
+
+    function imageclick(){
+        ID('cameraman').click();
     }
-    
+
 
     function addressapi(){
-        alert('いそまる水産');
         // make parameter
         var niukeid = ID('niukeid').value;
-        if (niukeid){
-            var sendData = JSON.stringify({'niukeid': niukeid});
+        if (!img_base) {
+            alert('画像が撮影されていません。')
+            return false;
+        }
+        if (niukeid.length == 8){
+            niukeid = niukeid.substr(1,6);
+        }
+        
+        if (niukeid.length == 6){
+            var sendData = JSON.stringify({'niuke':niukeid,'content_file':img_base,'dest':'ftp.toyoake.test'});
             // send api
             var xhr = new XMLHttpRequest();
-            xhr.open('POST',"http://baker.oroshi.toyoake.or.jp:5000/test/",true);
+            xhr.open('POST',"http://coltrane.oroshi.toyoake.or.jp:8020/maedori-backend/api/v1.0/image/",true);
             xhr.setRequestHeader('Content-Type','application/json')
+
+            // xhr.open('POST',"http://baker.oroshi.toyoake.or.jp:5000/test/",true);
+            // xhr.setRequestHeader('Content-Type','application/json');
             xhr.send(sendData);
 
             // receive api response
-            xhr.onreadystatechange = function() {
-                if ( xhr.readyState == 4 && xhr.status == 200 ) {
+            xhr.onload = function() {
                 var data = JSON.parse(xhr.responseText);
-                alert(data)
+                if (data["message"].indexOf('success') >= 0){
+                    alert('送信完了！')
                 }
+                else{
+                    alert(data["message"])
+                }
+            }
+
+            // error
+            xhr.onerror = function() {
+                alert('送信エラーです。管理者に確認して下さい');
             }
         }
         else{
-            alert('荷受番号が入力されていません');
+            alert('荷受番号に誤りがあります');
         }
     }
+
+
+    // encode base64
+    function openimg(obj,imgfile){
+        const file = obj.files[0]
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = document.getElementById("myImage")
+            img.src = e.target.result;
+            img_base = e.target.result.split(',')[1];
+        }
+        reader.readAsDataURL(file);
+        ID('guide').style.display = 'none'
+
+}
+
     </script>
 </body>
 </html>
