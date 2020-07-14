@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <title>前撮り君 Web Version</title>
     <style type="text/css">
@@ -21,12 +22,12 @@
         }
         .picturesize{
             width:100rem;
-            height:15rem;
+            height:21rem;
             border:2px dashed;
             object-fit: contain;
             }
         .explane{
-            height:5rem;
+            height:7rem;
         }
     </style>
 </head>
@@ -35,20 +36,20 @@
         <h1 class="has-text-centered">前撮り君 Web Version</h1>
         <form action="." method="post" enctype="multipart/form-data" id="formobj" onsubmit="return false;">
             <div class="columns is-mobile my-5 mx-5">
-                <div class="column is-6 imgbox" onclick="imageclick()">
+                <div class="column is-7 imgbox" onclick="imageclick()">
                     <img id="myImage" name="myImage" class="picturesize">
                     <div id="guide" class="picturezone"><i class="far fa-image"></i></div>
                 </div>
-                <div class="column is-6">
+                <div class="column is-5 is-size-4">
                     <div class="explane">
                         <p>1.荷受番号を入力します</p>
-                        <input type="tel" class="input" id="niukeid">
+                        <input type="tel" class="input is-large" id="niukeid">
                     </div>
-                    <div class="explane"><p>2.左の枠をタップして撮影してください</p></div>
+                    <div class="explane"><p>2.左の枠をタップして撮影します</p></div>
                     <!-- <div ><label for="cameraman" class="button is-fullwidth is-info"><input type="file" id="cameraman" name="capture" onchange="openimg(this)" capture="camera" style="display:none" accept="image/*">撮影</label></div> -->
                     <input type="file" id="cameraman" name="capture" onchange="openimg(this)" capture="camera" style="display:none" accept="image/*">
                     <div class="explane">
-                        <p>3.撮影画像を確認後、送信してください</p>
+                        <p>3.画像を確認後、送信してください</p>
                         <input type="button" class="button is-fullwidth is-success" value="送信" onclick="addressapi()"/>
                     </div>
                 </div>
